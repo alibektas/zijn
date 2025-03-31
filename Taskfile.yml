@@ -1,0 +1,7 @@
+version: "3"
+
+tasks:
+  request:
+    desc: "Send a curl request to https://localhost:8443/{route}"
+    cmds:
+      - curl --cacert ./self_signed_certs/cert.pem https://localhost:8443{{.CLI_ARGS}}
