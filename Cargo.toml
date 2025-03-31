@@ -1,10 +1,13 @@
 [workspace]
 resolver = "3"
-members = [ "crates/server" , "xtask"]
+members = [ "crates/client", "crates/server" , "xtask"]
 
 [workspace.dependencies]
 clap = { version = "4.5.32", features = ["derive"] }
 dotenv = "0.15.0"
+
+# Dependents crates/server & crates/client
+reqwest = "0.12.15"
 
 
 [workspace.lints.clippy]

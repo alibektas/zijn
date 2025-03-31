@@ -14,3 +14,4 @@ tracing = "0.1.41"
 tracing-subscriber = { version = "0.3.19", features = ["env-filter"] }
 
 dotenv.workspace = true
+reqwest.workspace = true
