@@ -4,6 +4,7 @@ members = [ "crates/server" , "xtask"]
 
 [workspace.dependencies]
 clap = { version = "4.5.32", features = ["derive"] }
+dotenv = "0.15.0"
 
 
 [workspace.lints.clippy]
@@ -50,9 +51,6 @@ dbg_macro = "warn"
 todo = "warn"
 print_stdout = "warn"
 print_stderr = "warn"
-
-unwrap_used = "forbid"
-expect_used = "forbid"
 
 rc_buffer = "warn"
 str_to_string = "warn"

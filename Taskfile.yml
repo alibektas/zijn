@@ -5,3 +5,49 @@ tasks:
     desc: "Send a curl request to https://localhost:8443/{route}"
     cmds:
       - curl --cacert ./self_signed_certs/cert.pem https://localhost:8443{{.CLI_ARGS}}
+
+  generate_certs:
+    desc: "Generate self-signed certificates"
+    cmds:
+      - task: keycloak_self_sign
+      - task: rustls_self_sign
+
+  keycloak_self_sign:
+    desc: "Create self-signed certificate for Keycloak"
+    cmds:
+      - mkdir -p cert/keycloak  # Ensure directory exists
+      - openssl req -x509 -newkey rsa:4096 -keyout cert/keycloak/server.key -out cert/keycloak/server.crt -days 365 -nodes -batch -subj "/CN=localhost" 
+
+  rustls_self_sign:
+    desc: "Create self-signed certificate for Rust server"
+    cmds:
+      - mkdir -p cert/server  # Ensure directory exists
+      - openssl req -x509 -newkey rsa:4096 -keyout cert/server/key.pem -out cert/server/cert.pem -days 365 -nodes -batch -subj "/CN=localhost" 
+
+  clean_cert:
+    desc: "Remove all certificates"
+    cmds:
+      - |
+        rm -r cert
+        mkdir cert
+        mkdir cert/keycloak
+        mkdir cert/server
+
+  setup :
+    desc: "Setup"
+    cmds:
+      - task : generate_certs
+    silent: true
+
+  up :
+    desc: "Up all services"
+    cmds :
+      - docker compose up -d
+      # Wait until all services are healthy
+      # TODO
+      - |
+        until [ "$(docker compose ps --format '{{.State}}' | grep -c 'running')" == "$(docker compose ps --format '{{.State}}' | wc -l | awk '{print $1}')" ]; do 
+          echo "Waiting for all services to be running..."; 
+          sleep 10; 
+        done
+      - cargo run --bin server

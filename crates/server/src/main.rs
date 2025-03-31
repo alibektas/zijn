@@ -13,12 +13,34 @@ async fn index(_req: HttpRequest) -> impl Responder {
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
+    // .env files being a resource for hiding sensitive data
+    // we restrict its use exclusively to dev builds.
+    #[cfg(debug_assertions)]
+    dotenv::dotenv().expect("Error loading .env file");
+
     rustls::crypto::aws_lc_rs::default_provider()
         .install_default()
         .unwrap();
 
-    let mut certs_file = BufReader::new(File::open("cert.pem").unwrap());
-    let mut key_file = BufReader::new(File::open("key.pem").unwrap());
+    let workspace_root = PathBuf::from(
+        env::var("CARGO_WORKSPACE_DIR")
+            .expect("CARGO_WORKSPACE_DIR not set please refer to .cargo/config.toml"),
+    );
+
+    let (mut certs_file, mut key_file) = if cfg!(debug_assertions) {
+        let cert_folder = PathBuf::from(
+            env::var("DEV_SERVER_CERT_FOLDER").expect("DEV_SERVER_CERT_FOLDER not set"),
+        );
+        let cert_folder = workspace_root
+            .join(cert_folder)
+            .canonicalize()
+            .expect("DEV_SERVER_CERT_FOLDER could not be canonicalized");
+        let certs_file = BufReader::new(File::open(cert_folder.join("server/cert.pem")).unwrap());
+        let key_file = BufReader::new(File::open(cert_folder.join("server/key.pem")).unwrap());
+        (certs_file, key_file)
+    } else {
+        todo!()
+    };
 
     let tls_certs = rustls_pemfile::certs(&mut certs_file)
         .collect::<Result<Vec<_>, _>>()
