@@ -1,0 +1,29 @@
+version: "3.8"
+
+services:
+  postgres:
+    image: postgres:15
+    container_name: postgres
+    restart: always
+    environment:
+      POSTGRES_USER: authuser
+      POSTGRES_PASSWORD: authpassword
+      POSTGRES_DB: authdb
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  # auth-server:
+  #   build:
+  #     context: .
+  #     dockerfile: DockerfileAuthServer
+  #   depends_on:
+  #     - postgres
+  #   environment:
+  #     DATABASE_URL: postgres://authuser:authpassword@postgres:5432/authdb
+  #   ports:
+  #     - "8000:8000"
+
+volumes:
+  postgres_data:

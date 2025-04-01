@@ -1,0 +1,12 @@
+version: "3"
+
+tasks:
+  db:purge:
+    desc: "Purge DB"
+    cmds:
+      - diesel database reset --database-url $AUTH_DATABASE_URL
+  db:setup:
+    desc: "Setup DB"
+    cmds:
+      - diesel setup --database-url $AUTH_DATABASE_URL
+

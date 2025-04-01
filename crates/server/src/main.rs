@@ -1,18 +1,24 @@
-#![allow(unused_imports)]
+mod middleware;
+
 use actix_web::{
     App, HttpRequest, HttpServer, Responder, get,
-    web::{self, service},
+    web::{self},
 };
-use std::{env, fs::File, io::BufReader, net::SocketAddr, path::PathBuf};
-use tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt};
+use keycloak::{self, KeycloakAdmin, KeycloakAdminToken};
+use std::{env, fs::File, io::BufReader, path::PathBuf};
 
 #[get("/")]
-async fn index(_req: HttpRequest) -> impl Responder {
+async fn index(data: web::Data<AppState>, _req: HttpRequest) -> impl Responder {
     "Hello TLS World!"
+}
+
+struct AppState {
+    keycloak: KeycloakAdmin,
 }
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
+    env_logger::init();
     // .env files being a resource for hiding sensitive data
     // we restrict its use exclusively to dev builds.
     #[cfg(debug_assertions)]
@@ -56,8 +62,21 @@ async fn main() -> std::io::Result<()> {
         .with_single_cert(tls_certs, rustls::pki_types::PrivateKeyDer::Pkcs8(tls_key))
         .unwrap();
 
-    HttpServer::new(|| App::new().service(index))
-        .bind_rustls_0_23(("127.0.0.1", 8443), tls_config)?
+    // Fetch the admin token and initialize KeycloakAdmin synchronously
+    let url = std::env::var("KEYCLOAK_ADDR").unwrap();
+    let user = std::env::var("KEYCLOAK_ADMIN").unwrap();
+    let password = std::env::var("KEYCLOAK_ADMIN_PASSWORD").unwrap();
+    let client = reqwest::Client::new();
+    let admin_token = KeycloakAdminToken::acquire(&url, &user, &password, &client)
+        .await
+        .expect("Admin token couldn't be acquired");
+
+    let admin = KeycloakAdmin::new(&url, admin_token, client);
+    let app_state = web::Data::new(AppState { keycloak: admin });
+
+    HttpServer::new(move || App::new().app_data(app_state.clone()).service(index))
+        .bind_rustls_0_23(("127.0.0.1", 8443), tls_config)
+        .unwrap()
         .run()
         .await
 }

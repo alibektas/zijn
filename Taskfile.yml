@@ -1,5 +1,13 @@
 version: "3"
 
+dotenv: ['.env']
+
+includes:
+  auth:
+    taskfile: ./auth/Taskfile.yml
+    dir: ./auth/
+
+
 tasks:
   request:
     desc: "Send a curl request to https://localhost:8443/{route}"
@@ -51,3 +59,7 @@ tasks:
           sleep 10; 
         done
       - cargo run --bin server
+
+  run:server :
+    cmds :
+      -  RUST_LOG="actix_web=debug,actix_server=debug" cargo run --bin server

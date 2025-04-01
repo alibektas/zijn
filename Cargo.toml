@@ -1,6 +1,6 @@
 [workspace]
 resolver = "3"
-members = [ "crates/client", "crates/keycloak_admin_api", "crates/server" , "xtask"]
+members = [ "auth", "crates/client", "crates/keycloak_admin_api", "crates/server" , "xtask"]
 
 [workspace.dependencies]
 clap = { version = "4.5.32", features = ["derive"] }
@@ -8,6 +8,19 @@ dotenv = "0.15.0"
 chrono = "0.4.40"
 serde_json = "1.0.116"
 serde = { version = "1.0.203" , features = ["derive"] }
+env_logger = "0.11.7"
+
+diesel = { version = "2.1.0", features = ["postgres", "r2d2", "uuid", "chrono"] }
+diesel_derives = "2.2.4"
+uuid = { version = "1.16.0", features = [ "serde" , "v4"] }
+
+actix-web = { version = "4", features = ["rustls-0_23"] }
+hyper = { version = "1.6.0", features = ["http2"] }
+hyper-rustls = "0.27.5"
+rustls-pemfile = "2"
+rustls = "0.23.25"
+keycloak = "26.1.0"
+futures-util = "0.3.31"
 
 
 # Dependents crates/server & crates/client
