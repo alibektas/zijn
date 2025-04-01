@@ -5,6 +5,10 @@ edition = "2024"
 
 [dependencies]
 clap.workspace = true
+reqwest.workspace = true
+keycloak_admin_api.workspace = true 
+tokio.workspace = true
+dotenv.workspace = true
 
 [lints]
 workspace = true

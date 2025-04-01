@@ -1,14 +1,23 @@
 [workspace]
 resolver = "3"
-members = [ "crates/client", "crates/server" , "xtask"]
+members = [ "crates/client", "crates/keycloak_admin_api", "crates/server" , "xtask"]
 
 [workspace.dependencies]
 clap = { version = "4.5.32", features = ["derive"] }
 dotenv = "0.15.0"
+chrono = "0.4.40"
+serde_json = "1.0.116"
+serde = { version = "1.0.203" , features = ["derive"] }
+
 
 # Dependents crates/server & crates/client
-reqwest = "0.12.15"
+reqwest = { version = "0.12.15" , features = ["json", "rustls-tls"]}
+tokio = { version = "1.44.1", features=["full"]}
+tracing = "0.1.41"
+tracing-subscriber = { version = "0.3.19", features = ["env-filter"] }
 
+# local crates
+keycloak_admin_api = { path = "./crates/keycloak_admin_api" }
 
 [workspace.lints.clippy]
 ## lint groups
