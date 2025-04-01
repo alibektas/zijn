@@ -4,6 +4,8 @@ version = "0.1.0"
 edition = "2024"
 
 [dependencies]
+# MongoDB is our go-to NoSQL for storing chat history
+mongodb = "3.2.3"
 
 dotenv.workspace = true
 reqwest.workspace = true
@@ -19,3 +21,5 @@ rustls-pemfile.workspace = true
 rustls.workspace = true
 keycloak.workspace = true
 futures-util.workspace = true
+uuid.workspace = true
+chrono.workspace = true

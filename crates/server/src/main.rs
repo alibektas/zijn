@@ -1,3 +1,4 @@
+mod chatdb;
 mod middleware;
 
 use actix_web::{
